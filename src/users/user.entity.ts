@@ -1,8 +1,10 @@
 import { Exclude } from 'class-transformer';
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/common.entity';
-import { Column } from 'typeorm';
+import { Order } from 'src/orders/order.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
+@Entity({ name: 'User' })
 export class User extends CommonEntity {
   @IsEmail({}, { message: '올바른 이메일을 작성해주세요.' })
   @IsNotEmpty({ message: '이메일을 작성해주세요.' })
@@ -25,4 +27,7 @@ export class User extends CommonEntity {
   @IsBoolean()
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
+
+  @OneToMany(() => Order, (orders) => orders.user)
+  orders: Order[];
 }
