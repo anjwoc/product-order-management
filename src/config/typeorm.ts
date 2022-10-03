@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Order } from 'src/orders/order.entity';
+import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
@@ -15,7 +16,7 @@ const typeOrmModuleConfig = {
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
-    entities: [User, Order],
+    entities: [User, Order, Product],
     synchronize: true,
     autoLoadEntities: true,
     logging: true,

@@ -1,19 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './product.entity';
 
 @Injectable()
 export class ProductsService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
+  ) {}
+
+  async create(
+    createProductDto: CreateProductDto,
+  ): Promise<number | undefined> {
+    const product = await this.productRepository.create(createProductDto);
+
+    await this.productRepository.save(product);
+
+    return product.id;
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(): Promise<Product[] | undefined> {
+    const products = await this.productRepository.find();
+
+    return products;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number): Promise<Product | undefined> {
+    const product = await this.productRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!product) {
+      throw new BadRequestException('일치하는 상품이 없습니다.');
+    }
+
+    return product;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
