@@ -9,12 +9,6 @@ import { PaymentsModule } from './payments/payments.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidation } from './validations/config.validation';
 import { typeOrmModuleConfig } from './config/typeorm';
-import { ProductsController } from './products/products.controller';
-import { ProductsService } from './products/products.service';
-import { UsersController } from './users/users.controller';
-import { OrdersController } from './orders/orders.controller';
-import { UsersService } from './users/users.service';
-import { OrdersService } from './orders/orders.service';
 
 @Module({
   imports: [
@@ -28,12 +22,7 @@ import { OrdersService } from './orders/orders.service';
     ProductsModule,
     PaymentsModule,
   ],
-  controllers: [
-    AppController,
-    // UsersController,
-    // OrdersController,
-    // ProductsController,
-  ],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

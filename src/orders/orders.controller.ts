@@ -11,6 +11,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
+import { PartialCancelOrderDto } from './dto/partial-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -19,6 +20,11 @@ export class OrdersController {
   @Post()
   requestOrder(@Body() requestOrderDto: RequestOrderDto) {
     return this.ordersService.requestOrder(requestOrderDto);
+  }
+
+  @Post('/cancel')
+  partialCancelOrder(@Body() partialCancelOrderDto: PartialCancelOrderDto) {
+    return this.ordersService.partialCancelOrder(partialCancelOrderDto);
   }
 
   @Post()

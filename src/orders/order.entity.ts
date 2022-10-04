@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/common.entity';
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
-import { Column, Entity, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { OrderStatus } from './order.status';
 
 @Entity({ name: 'Order' })
@@ -31,9 +31,30 @@ export class Order extends CommonEntity {
   @ManyToOne(() => User, (users) => users.orders)
   user: User;
 
+  // @ManyToMany(() => Product, (product) => product.orders)
+  // @JoinTable({
+  //   name: 'OrderProducts',
+  //   joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  //   inverseJoinColumn: { name: 'order_id', referencedColumnName: 'id' },
+  // })
+  // products: Product[];
+
+  // @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.order)
+  // orderProudcts: OrderProducts[];
+
   @ManyToMany(() => Product, (products) => products.orders, {
-    onDelete: 'NO ACTION',
+    cascade: true,
   })
-  @JoinTable()
+  @JoinTable({
+    name: 'Order_Products',
+    joinColumn: {
+      name: 'order_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'product_id',
+      referencedColumnName: 'id',
+    },
+  })
   products: Product[];
 }

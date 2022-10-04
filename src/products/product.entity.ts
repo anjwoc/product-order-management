@@ -20,8 +20,9 @@ export class Product extends CommonEntity {
   @Column({ type: 'integer', nullable: false })
   stockQuantity: number;
 
-  @ManyToMany(() => Order, (orders) => orders.products, {
-    onDelete: 'NO ACTION',
-  })
+  @ManyToMany(() => Order, (orders) => orders.products)
   orders: Order[];
+
+  // @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.product)
+  // orderProudcts: OrderProducts[];
 }
