@@ -7,6 +7,8 @@ import { AppModule } from './app.module';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './exceptions/http-exception.filter';
+
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
@@ -56,6 +58,7 @@ class Application {
     this.app.useGlobalInterceptors(
       new ClassSerializerInterceptor(this.app.get(Reflector)),
     );
+    this.app.useGlobalFilters(new HttpExceptionFilter());
 
     // passport 설정
     this.app.use(passport.initialize());

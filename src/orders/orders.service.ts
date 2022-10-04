@@ -93,30 +93,42 @@ export class OrdersService {
   async partialCancelOrder(
     partialCancelOrderDto: PartialCancelOrderDto,
   ): Promise<Order> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     const { orderId, products } = partialCancelOrderDto;
 
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId },
-      relations: ['products'],
-    });
+    try {
+      const order = await this.orderRepository.findOne({
+        where: { id: orderId },
+        relations: ['products'],
+      });
 
-    if (!order) {
-      throw new BadRequestException('존재하지 않는 주문 번호입니다.');
+      if (!order) {
+        throw new BadRequestException('존재하지 않는 주문 번호입니다.');
+      }
+
+      const filteredProducts = order.products.filter(
+        (order) => !products.includes(order.id),
+      );
+
+      if (!filteredProducts) {
+        throw new BadRequestException('취소할 상품이 없습니다.');
+      }
+
+      order.products = filteredProducts;
+
+      const partialCancel = await this.orderRepository.save(order);
+
+      await queryRunner.commitTransaction();
+
+      return partialCancel;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
     }
-
-    const filteredProducts = order.products.filter(
-      (order) => !products.includes(order.id),
-    );
-
-    if (!filteredProducts) {
-      throw new BadRequestException('취소할 상품이 없습니다.');
-    }
-
-    order.products = filteredProducts;
-
-    const partialCancel = await this.orderRepository.save(order);
-
-    return partialCancel;
   }
 
   async partialCancelOrderTest(
