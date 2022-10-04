@@ -33,7 +33,7 @@ export class Order extends CommonEntity {
 
   @ManyToMany(() => Product, (products) => products.orders, {
     cascade: true,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinTable({

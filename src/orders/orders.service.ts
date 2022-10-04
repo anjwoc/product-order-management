@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/products/product.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
@@ -16,6 +16,9 @@ export class OrdersService {
 
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+
+    @InjectDataSource()
+    private connection: DataSource,
   ) {}
   async create(createOrderDto: CreateOrderDto): Promise<Order | undefined> {
     const order = await this.orderRepository.create(createOrderDto);
@@ -26,6 +29,43 @@ export class OrdersService {
   }
 
   async requestOrder(requestOrderDto: RequestOrderDto) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const { products, ...params } = requestOrderDto;
+
+    try {
+      const orderProducts = await queryRunner.manager
+        .getRepository(Product)
+        .createQueryBuilder('product')
+        .where('product.id IN (:...ids)', { ids: products })
+        .getMany();
+
+      if (!orderProducts) {
+        throw new BadRequestException('주문 가능한 상품이 없습니다.');
+      }
+
+      if (!(products.length === orderProducts.length)) {
+        throw new BadRequestException('일부 상품이 등록된 상품이 아닙니다.');
+      }
+
+      const order = await queryRunner.manager.getRepository(Order).create({
+        ...params,
+        products: orderProducts,
+      });
+
+      await queryRunner.manager.getRepository(Order).save(order);
+
+      return order;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async requestOrderback(requestOrderDto: RequestOrderDto) {
     const { products, ...params } = requestOrderDto;
     const orderProudcts = await this.productRepository
       .createQueryBuilder('product')

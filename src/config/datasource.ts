@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 
-const datasource = new DataSource({
+const DBConnection = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
@@ -12,8 +12,7 @@ const datasource = new DataSource({
   logging: true,
 });
 
-datasource
-  .initialize()
+DBConnection.initialize()
   .then(() => {
     console.log('Data Source has been initialized!');
   })
@@ -21,4 +20,4 @@ datasource
     console.error('Error during Data Source initialization', err);
   });
 
-export { datasource };
+export { DBConnection };
