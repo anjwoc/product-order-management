@@ -169,6 +169,10 @@ export class OrdersService {
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOne({ where: { id } });
 
+    if (!order) {
+      throw new BadRequestException('존재하지 않는 주문번호입니다.');
+    }
+
     return order;
   }
 

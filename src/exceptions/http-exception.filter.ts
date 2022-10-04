@@ -16,18 +16,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const error = exception.getResponse() as
       | string
       | { error: string; statusCode: number; message: string[] };
+    const stacktrace = exception.stack;
 
     this.logger.error(error);
 
     if (!(typeof error === 'string')) {
-      response
-        .status(status)
-        .json({ success: true, statusCode: status, message: error });
+      response.status(status).json({
+        success: false,
+        statusCode: status,
+        message: { ...error, stacktrace },
+      });
       return;
     }
 
     response
       .status(status)
-      .json({ success: false, ...(error as unknown as object) });
+      .json({ success: true, ...(error as unknown as object) });
   }
 }
