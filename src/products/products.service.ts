@@ -42,11 +42,25 @@ export class ProductsService {
     return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<boolean> {
+    const updatedRow = await this.productRepository.update(
+      id,
+      updateProductDto,
+    );
+
+    const isUpdated = updatedRow.affected > 0;
+
+    return isUpdated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number): Promise<boolean> {
+    const deletedRow = await this.productRepository.delete(id);
+
+    const isDeleted = deletedRow.affected > 0;
+
+    return isDeleted;
   }
 }

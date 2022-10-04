@@ -7,8 +7,9 @@ import { AppModule } from './app.module';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
-import * as passport from 'passport';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import session from 'express-session';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -34,15 +35,29 @@ class Application {
   };
 
   private async setupMiddleWare() {
+    // cookie parser
+    this.app.use(cookieParser());
+    this.app.use(
+      session({
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.COOKIE_SECRET,
+        cookie: {
+          httpOnly: true,
+        },
+      }),
+    );
+
+    // swagger module
     this.setupSwaggerModule();
 
-    this.app.use(cookieParser);
-
+    // global pipe, filter, interceptor
     this.app.useGlobalPipes(new ValidationPipe({ transform: true }));
     this.app.useGlobalInterceptors(
       new ClassSerializerInterceptor(this.app.get(Reflector)),
     );
 
+    // passport 설정
     this.app.use(passport.initialize());
     this.app.use(passport.session());
   }
@@ -62,5 +77,5 @@ async function initialize(): Promise<void> {
 }
 
 initialize().catch((err) => {
-  new Logger('init').error(err);
+  console.error(err);
 });
