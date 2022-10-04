@@ -31,19 +31,10 @@ export class Order extends CommonEntity {
   @ManyToOne(() => User, (users) => users.orders)
   user: User;
 
-  // @ManyToMany(() => Product, (product) => product.orders)
-  // @JoinTable({
-  //   name: 'OrderProducts',
-  //   joinColumn: { name: 'product_id', referencedColumnName: 'id' },
-  //   inverseJoinColumn: { name: 'order_id', referencedColumnName: 'id' },
-  // })
-  // products: Product[];
-
-  // @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.order)
-  // orderProudcts: OrderProducts[];
-
   @ManyToMany(() => Product, (products) => products.orders, {
     cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinTable({
     name: 'Order_Products',

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -27,6 +28,11 @@ export class OrdersController {
     return this.ordersService.partialCancelOrder(partialCancelOrderDto);
   }
 
+  @Post('/cancel-test')
+  partialCancelOrderTest(@Body() partialCancelOrderDto: PartialCancelOrderDto) {
+    return this.ordersService.partialCancelOrderTest(partialCancelOrderDto);
+  }
+
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
@@ -42,7 +48,7 @@ export class OrdersController {
     return this.ordersService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(+id, updateOrderDto);
   }

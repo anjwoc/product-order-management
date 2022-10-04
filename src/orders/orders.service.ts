@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/products/product.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
@@ -79,21 +79,64 @@ export class OrdersService {
     return partialCancel;
   }
 
-  async findAll() {
+  async partialCancelOrderTest(
+    partialCancelOrderDto: PartialCancelOrderDto,
+  ): Promise<UpdateResult> {
+    const { orderId, products } = partialCancelOrderDto;
+
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['products'],
+    });
+
+    if (!order) {
+      throw new BadRequestException('존재하지 않는 주문 번호입니다.');
+    }
+
+    const filteredProducts = order.products.filter(
+      (order) => !products.includes(order.id),
+    );
+
+    if (!filteredProducts) {
+      throw new BadRequestException('취소할 상품이 없습니다.');
+    }
+
+    order.products = filteredProducts;
+
+    const partialCancel = await this.orderRepository.update(orderId, order);
+
+    return partialCancel;
+  }
+
+  async findAll(): Promise<Order[]> {
     const orders = await this.orderRepository.find({ relations: ['products'] });
 
     return orders;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id } });
+
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<boolean> {
+    const updatedRow = await this.orderRepository.update(id, updateOrderDto);
+
+    const isUpdated = updatedRow.affected > 0;
+
+    return isUpdated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: number): Promise<boolean> {
+    const deletedRow = await this.orderRepository.delete(id);
+
+    const isDeleted = deletedRow.affected > 0;
+
+    if (!isDeleted) {
+      throw new BadRequestException('존재하지 않는 주문 번호입니다.');
+    }
+
+    return isDeleted;
   }
 }
