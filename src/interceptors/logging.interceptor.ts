@@ -16,14 +16,14 @@ export class LoggingInterceptor implements NestInterceptor {
     const handler = context.getHandler().name;
     const logger = new Logger(controller);
 
-    logger.debug(`[${handler}] ${request.path} START`);
+    logger.debug(`[${handler}] ${request.path} [START]`);
     const now = Date.now();
     return next
       .handle()
       .pipe(
         tap(() =>
           logger.debug(
-            `[${handler}] ${request.path} END ${Date.now() - now}ms`,
+            `[${handler}] ${request.path} [END ${Date.now() - now}ms]`,
           ),
         ),
       );
