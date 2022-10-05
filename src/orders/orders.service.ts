@@ -56,6 +56,7 @@ export class OrdersService {
       });
 
       await queryRunner.manager.getRepository(Order).save(order);
+      await queryRunner.commitTransaction();
 
       return order;
     } catch (err) {
@@ -96,7 +97,6 @@ export class OrdersService {
       order.products = filteredProducts;
 
       const partialCancel = await this.orderRepository.save(order);
-
       await queryRunner.commitTransaction();
 
       return partialCancel;

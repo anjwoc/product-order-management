@@ -22,7 +22,6 @@ export class Order extends CommonEntity {
 
   @Column({
     type: 'enum',
-    nullable: false,
     enum: OrderStatus,
     default: OrderStatus.READY,
   })
