@@ -1,16 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
-import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
 import { Product } from 'src/products/product.entity';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { OrderDto } from './dto/order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './order.entity';
+import { OrderStatus } from './order.status';
 
 @Injectable()
 export class OrdersService {
@@ -112,6 +113,27 @@ export class OrdersService {
     }
   }
 
+  async completeOrder(id: number): Promise<boolean> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const updatedRow = await this.orderRepository.update(id, {
+        orderStatus: OrderStatus.COMPLETED,
+      });
+
+      const isUpdaetd = updatedRow.affected > 0;
+
+      return isUpdaetd;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async partialCancelOrderTest(
     partialCancelOrderDto: PartialCancelOrderDto,
   ): Promise<UpdateResult> {
@@ -141,11 +163,16 @@ export class OrdersService {
     return partialCancel;
   }
 
-  async getOrderList(
-    pageOptionsDto: PageOptionsDto,
+  async findAll(
+    pageOptionsDto: OrderPaginationDto,
   ): Promise<PageDto<OrderDto>> {
-    const { take, skip, order } = pageOptionsDto;
+    const { take, skip, order, orderStatus } = pageOptionsDto;
+    console.log(orderStatus);
+    // console.log(OrderStatus[status]);
     const [orders, itemCount] = await this.orderRepository.findAndCount({
+      where: {
+        orderStatus: orderStatus,
+      },
       take: take,
       skip: skip,
       order: { createdAt: order },

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -14,11 +13,10 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
-import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
-import { Order } from './order.entity';
 import { OrderDto } from './dto/order.dto';
+import { OrderPaginationDto } from './dto/order-pagination.dto';
 
 @Controller('orders')
 @ApiTags('Orders')
@@ -28,6 +26,11 @@ export class OrdersController {
   @Post()
   requestOrder(@Body() requestOrderDto: RequestOrderDto) {
     return this.ordersService.requestOrder(requestOrderDto);
+  }
+
+  @Post('/complete/:id')
+  completeOrder(@Param('id') id: string) {
+    return this.ordersService.completeOrder(+id);
   }
 
   @Post('/cancel')
@@ -47,12 +50,12 @@ export class OrdersController {
 
   @Get()
   @ApiPaginatedResponse(OrderDto)
-  findAll(@Query() pageOptionsDto: PageOptionsDto) {
-    return this.ordersService.getOrderList(pageOptionsDto);
+  getOrderList(@Query() orderPaginationDto: OrderPaginationDto) {
+    return this.ordersService.findAll(orderPaginationDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  getOrderDetail(@Param('id') id: string) {
     return this.ordersService.findOne(+id);
   }
 
