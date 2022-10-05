@@ -7,14 +7,21 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
+import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
+import { Order } from './order.entity';
+import { OrderDto } from './dto/order.dto';
 
 @Controller('orders')
+@ApiTags('Orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -39,8 +46,9 @@ export class OrdersController {
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  @ApiPaginatedResponse(OrderDto)
+  findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.ordersService.getOrderList(pageOptionsDto);
   }
 
   @Get(':id')

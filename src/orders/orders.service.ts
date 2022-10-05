@@ -1,8 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
+import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { PageDto } from 'src/common/dto/pagination.dto';
 import { Product } from 'src/products/product.entity';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { OrderDto } from './dto/order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -137,13 +141,27 @@ export class OrdersService {
     return partialCancel;
   }
 
-  async findAll(): Promise<Order[]> {
-    const orders = await this.orderRepository.find({ relations: ['products'] });
+  async getOrderList(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<OrderDto>> {
+    const { take, skip, order } = pageOptionsDto;
+    const [orders, itemCount] = await this.orderRepository.findAndCount({
+      take: take,
+      skip: skip,
+      order: { createdAt: order },
+      relations: ['products'],
+    });
 
-    return orders;
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+
+    return new PageDto(orders, pageMeta);
   }
 
   async findOne(id: number): Promise<Order> {
+    if (!id) {
+      throw new BadRequestException('주문 번호가 없습니다.');
+    }
+
     const order = await this.orderRepository.findOne({ where: { id } });
 
     if (!order) {

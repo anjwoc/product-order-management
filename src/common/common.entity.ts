@@ -10,13 +10,15 @@ export abstract class CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn({ type: 'timestamptz' }) // timestamp with timezone
+  @Exclude()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz' }) // timestamp with timezone
+  @Exclude()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   @Exclude()
-  @DeleteDateColumn({ type: 'timestamptz' }) // timestamp with timezone
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date | null;
 }
