@@ -60,34 +60,10 @@ export class OrdersService {
       return order;
     } catch (err) {
       await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
       await queryRunner.release();
     }
-  }
-
-  async requestOrderback(requestOrderDto: RequestOrderDto) {
-    const { products, ...params } = requestOrderDto;
-    const orderProudcts = await this.productRepository
-      .createQueryBuilder('product')
-      .where('product.id IN (:...ids)', { ids: products })
-      .getMany();
-
-    if (!orderProudcts) {
-      throw new BadRequestException('주문 가능한 상품이 없습니다.');
-    }
-
-    if (!(products.length === orderProudcts.length)) {
-      throw new BadRequestException('일부 상품이 등록된 상품이 아닙니다.');
-    }
-
-    const order = await this.orderRepository.create({
-      ...params,
-      products: orderProudcts,
-    });
-
-    await this.orderRepository.save(order);
-
-    return order;
   }
 
   async partialCancelOrder(
@@ -126,6 +102,7 @@ export class OrdersService {
       return partialCancel;
     } catch (err) {
       await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
       await queryRunner.release();
     }
