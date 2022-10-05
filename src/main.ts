@@ -12,6 +12,8 @@ import { HttpExceptionFilter } from './exceptions/http-exception.filter';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { TransformInterceptor } from './interceptors/transform.interceptor';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -36,6 +38,16 @@ class Application {
     SwaggerModule.setup('api', this.app, document);
   };
 
+  private setupGlobalHandler() {
+    this.app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    this.app.useGlobalInterceptors(
+      new ClassSerializerInterceptor(this.app.get(Reflector)),
+    );
+    this.app.useGlobalFilters(new HttpExceptionFilter());
+    this.app.useGlobalInterceptors(new LoggingInterceptor());
+    this.app.useGlobalInterceptors(new TransformInterceptor());
+  }
+
   private async setupMiddleWare() {
     // cookie parser
     this.app.use(cookieParser());
@@ -54,11 +66,7 @@ class Application {
     this.setupSwaggerModule();
 
     // global pipe, filter, interceptor
-    this.app.useGlobalPipes(new ValidationPipe({ transform: true }));
-    this.app.useGlobalInterceptors(
-      new ClassSerializerInterceptor(this.app.get(Reflector)),
-    );
-    this.app.useGlobalFilters(new HttpExceptionFilter());
+    this.setupGlobalHandler();
 
     // passport 설정
     this.app.use(passport.initialize());
