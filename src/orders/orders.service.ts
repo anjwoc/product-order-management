@@ -1,5 +1,9 @@
 import { InjectQueue } from '@nestjs/bull';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
@@ -158,7 +162,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new BadRequestException('존재하지 않는 주문 번호입니다.');
+      throw new NotFoundException('존재하지 않는 주문 번호입니다.');
     }
 
     const filteredProducts = order.products.filter(
@@ -203,13 +207,17 @@ export class OrdersService {
     const order = await this.orderRepository.findOne({ where: { id } });
 
     if (!order) {
-      throw new BadRequestException('존재하지 않는 주문번호입니다.');
+      throw new NotFoundException('존재하지 않는 주문번호입니다.');
     }
 
     return order;
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<boolean> {
+    if (!id) {
+      throw new BadRequestException('주문 번호가 없습니다.');
+    }
+
     const updatedRow = await this.orderRepository.update(id, updateOrderDto);
 
     const isUpdated = updatedRow.affected > 0;
@@ -218,6 +226,10 @@ export class OrdersService {
   }
 
   async remove(id: number): Promise<boolean> {
+    if (!id) {
+      throw new BadRequestException('주문 번호가 없습니다.');
+    }
+
     const deletedRow = await this.orderRepository.delete(id);
 
     const isDeleted = deletedRow.affected > 0;
