@@ -6,7 +6,7 @@ import { Job } from 'bull';
 export class OrdersConsumer {
   private readonly logger = new Logger(OrdersConsumer.name);
 
-  printOrder(order) {
+  printOrderReuqest(order) {
     const {
       receiverName: name,
       receiverPhone: phoneNumber,
@@ -26,13 +26,28 @@ export class OrdersConsumer {
     this.logger.debug('======================================');
   }
 
+  printOrderCancel(products) {
+    this.logger.debug('================주문 취소 결과==========');
+    this.logger.debug('================취소된 상품 리스트======');
+    console.table(
+      products.map((item) => {
+        return {
+          '상품 번호': item.id,
+          '상품 이름': item.name,
+          '상품 가격': item.price,
+        };
+      }),
+    );
+    this.logger.debug('======================================');
+  }
+
   @Process('requestOrder')
   processOrder(job: Job) {
-    this.printOrder(job.data);
+    this.printOrderReuqest(job.data);
   }
 
   @Process('partialCancelOrder')
   partialCancelOrdr(job: Job) {
-    console.log('');
+    this.printOrderCancel(job.data);
   }
 }

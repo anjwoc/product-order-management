@@ -65,7 +65,7 @@ export class OrdersService {
       await queryRunner.manager.getRepository(Order).save(order);
       await queryRunner.commitTransaction();
 
-      await this.orderQueue.add('requestOrder', order);
+      this.orderQueue.add('requestOrder', order);
 
       return order;
     } catch (err) {
@@ -95,18 +95,27 @@ export class OrdersService {
         throw new BadRequestException('존재하지 않는 주문 번호입니다.');
       }
 
-      const filteredProducts = order.products.filter(
-        (order) => !products.includes(order.id),
-      );
+      const cancelProducts = [];
+      const remaining = [];
+      order.products.forEach((order) => {
+        if (!products.includes(order.id)) {
+          remaining.push(order);
+          return;
+        }
 
-      if (!filteredProducts) {
+        cancelProducts.push(order);
+      });
+
+      if (!remaining) {
         throw new BadRequestException('취소할 상품이 없습니다.');
       }
 
-      order.products = filteredProducts;
+      order.products = remaining;
 
       const partialCancel = await this.orderRepository.save(order);
       await queryRunner.commitTransaction();
+
+      this.orderQueue.add('partialCancelOrder', cancelProducts);
 
       return partialCancel;
     } catch (err) {
@@ -171,8 +180,6 @@ export class OrdersService {
     pageOptionsDto: OrderPaginationDto,
   ): Promise<PageDto<OrderDto>> {
     const { take, skip, order, orderStatus } = pageOptionsDto;
-    console.log(orderStatus);
-    // console.log(OrderStatus[status]);
     const [orders, itemCount] = await this.orderRepository.findAndCount({
       where: {
         orderStatus: orderStatus,
