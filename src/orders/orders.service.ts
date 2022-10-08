@@ -1,5 +1,7 @@
+import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Queue } from 'bull';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
 import { Product } from 'src/products/product.entity';
@@ -19,11 +21,11 @@ export class OrdersService {
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
 
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
-
     @InjectDataSource()
     private connection: DataSource,
+
+    @InjectQueue('order')
+    private orderQueue: Queue,
   ) {}
   async create(createOrderDto: CreateOrderDto): Promise<Order | undefined> {
     const order = await this.orderRepository.create(createOrderDto);
@@ -62,6 +64,8 @@ export class OrdersService {
 
       await queryRunner.manager.getRepository(Order).save(order);
       await queryRunner.commitTransaction();
+
+      await this.orderQueue.add('requestOrder', order);
 
       return order;
     } catch (err) {
