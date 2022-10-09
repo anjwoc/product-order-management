@@ -1,5 +1,4 @@
-import { PickType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { User } from '../user.entity';
 

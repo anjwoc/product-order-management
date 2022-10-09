@@ -1,4 +1,4 @@
-import { PartialType, PickType } from '@nestjs/mapped-types';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { Order } from '../order.entity';
 
 export class RequestOrderDto extends PickType(Order, [
