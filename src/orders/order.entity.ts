@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/common.entity';
 import { Product } from 'src/products/product.entity';
@@ -7,19 +8,27 @@ import { OrderStatus } from './order.status';
 
 @Entity({ name: 'Order' })
 export class Order extends CommonEntity {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverName: string;
 
+  @ApiProperty()
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverPhone: string;
 
+  @ApiProperty()
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverAddress: string;
 
+  @ApiProperty({
+    name: 'orderStatus',
+    enum: OrderStatus,
+    enumName: 'OrderStatus',
+  })
   @Column({
     type: 'enum',
     enum: OrderStatus,
@@ -27,9 +36,11 @@ export class Order extends CommonEntity {
   })
   orderStatus: OrderStatus;
 
+  @ApiProperty({ type: () => [User] })
   @ManyToOne(() => User, (users) => users.orders)
   user: User;
 
+  @ApiProperty({ type: () => [Product] })
   @ManyToMany(() => Product, (products) => products.orders, {
     cascade: true,
     onDelete: 'NO ACTION',

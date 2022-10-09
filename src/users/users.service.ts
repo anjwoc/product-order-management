@@ -17,9 +17,9 @@ import { UserPaginationDto } from './dto/user-pagination.dto';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {

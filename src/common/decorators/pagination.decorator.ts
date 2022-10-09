@@ -1,12 +1,13 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { UserDto } from 'src/users/dto/user.dto';
 import { PageDto } from '../dto/pagination.dto';
 
 export const ApiPaginatedResponse = <TModel extends Type<any>>(
   model: TModel,
 ) => {
   return applyDecorators(
-    ApiExtraModels(PageDto),
+    ApiExtraModels(PageDto, UserDto),
     ApiOkResponse({
       description: 'Successfully received model list',
       schema: {
