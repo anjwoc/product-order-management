@@ -18,6 +18,7 @@ import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator
 import { OrderDto } from './dto/order.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { Order } from './order.entity';
+import { PageDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -62,7 +63,9 @@ export class OrdersController {
   @Get()
   @ApiOperation({ summary: '주문 조회' })
   @ApiPaginatedResponse(OrderDto)
-  getOrderList(@Query() orderPaginationDto: OrderPaginationDto) {
+  getOrderList(
+    @Query() orderPaginationDto: OrderPaginationDto,
+  ): Promise<PageDto<OrderDto>> {
     return this.ordersService.findAll(orderPaginationDto);
   }
 

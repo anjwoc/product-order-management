@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
+import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { PageDto } from 'src/common/dto/pagination.dto';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 
@@ -12,20 +16,26 @@ export class ProductsService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async create(
-    createProductDto: CreateProductDto,
-  ): Promise<number | undefined> {
+  async create(createProductDto: CreateProductDto): Promise<ProductDto> {
     const product = await this.productRepository.create(createProductDto);
 
     await this.productRepository.save(product);
 
-    return product.id;
+    return product;
   }
 
-  async findAll(): Promise<Product[] | undefined> {
-    const products = await this.productRepository.find();
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ProductDto>> {
+    const { take, skip, orderBy } = pageOptionsDto;
+    const [orders, itemCount] = await this.productRepository.findAndCount({
+      take: take,
+      skip: skip,
+      order: { createdAt: orderBy },
+      relations: ['products'],
+    });
 
-    return products;
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+
+    return new PageDto(orders, pageMeta);
   }
 
   async findOne(id: number): Promise<Product | undefined> {
@@ -36,7 +46,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new BadRequestException('일치하는 상품이 없습니다.');
+      throw new NotFoundException('일치하는 상품이 없습니다.');
     }
 
     return product;

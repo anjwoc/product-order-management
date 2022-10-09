@@ -1,9 +1,21 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Product } from './product.entity';
+import { ProductDto } from './dto/product.dto';
+import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { PageDto } from 'src/common/dto/pagination.dto';
+import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
 
 @ApiTags('Products')
 @Controller('products')
@@ -17,19 +29,22 @@ export class ProductsController {
     description: '상품 등록 성공',
     type: CreateProductDto,
   })
-  create(@Body() createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: CreateProductDto): Promise<ProductDto> {
     return this.productsService.create(createProductDto);
   }
 
   @Get()
+  @ApiPaginatedResponse(ProductDto)
   @ApiOperation({ summary: '상품 조회' })
   @ApiResponse({
     status: 200,
     description: '상품 조회 성공',
     type: [Product],
   })
-  findAll() {
-    return this.productsService.findAll();
+  findAll(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<ProductDto>> {
+    return this.productsService.findAll(pageOptionsDto);
   }
 
   @Get(':id')

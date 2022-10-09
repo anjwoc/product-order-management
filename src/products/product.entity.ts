@@ -22,7 +22,4 @@ export class Product extends CommonEntity {
 
   @ManyToMany(() => Order, (orders) => orders.products)
   orders: Order[];
-
-  // @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.product)
-  // orderProudcts: OrderProducts[];
 }
