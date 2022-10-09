@@ -9,7 +9,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RequestOrderDto } from './dto/request-order.dto';
 import { PartialCancelOrderDto } from './dto/partial-order.dto';
@@ -20,6 +19,7 @@ import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { Order } from './order.entity';
 import { PageDto } from 'src/common/dto/pagination.dto';
 import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
+import { ApiResponseDto } from 'src/common/decorators/response-dto.decorator';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -28,10 +28,10 @@ export class OrdersController {
 
   @Post()
   @ApiOperation({ summary: '주문 접수 요청' })
+  @ApiResponseDto(RequestOrderDto)
   @ApiResponse({
     status: 200,
     description: '주문 접수 성공',
-    type: RequestOrderDto,
   })
   requestOrder(@Body() requestOrderDto: RequestOrderDto) {
     return this.ordersService.requestOrder(requestOrderDto);
@@ -39,10 +39,10 @@ export class OrdersController {
 
   @Post('/complete/:id')
   @ApiOperation({ summary: '주문 완료 요청' })
+  @ApiResponseDto(Boolean)
   @ApiResponse({
     status: 200,
     description: '주문 완료 요청 성공',
-    type: Boolean,
   })
   completeOrder(@Param('id') id: string): Promise<boolean> {
     return this.ordersService.completeOrder(+id);
@@ -50,10 +50,10 @@ export class OrdersController {
 
   @Post('/cancel/:id')
   @ApiOperation({ summary: '주문 취소 요청' })
+  @ApiResponseDto(Boolean)
   @ApiResponse({
     status: 200,
     description: '주문 취소 요청 성공',
-    type: Boolean,
   })
   cancelOrder(@Param('id') id: string): Promise<UpdateSuccessDto> {
     return this.ordersService.cancelOrder(id);
@@ -61,10 +61,10 @@ export class OrdersController {
 
   @Post('/partial-cancel')
   @ApiOperation({ summary: '상품 부분 취소 요청' })
+  @ApiResponseDto(Order)
   @ApiResponse({
     status: 200,
     description: '상품 부분 취소 요청 성공',
-    type: Order,
   })
   partialCancelOrder(
     @Body() partialCancelOrderDto: PartialCancelOrderDto,
@@ -83,10 +83,10 @@ export class OrdersController {
 
   @Get(':id')
   @ApiOperation({ summary: '주문 상세 조회' })
+  @ApiResponseDto(Order)
   @ApiResponse({
     status: 200,
     description: '주문 상세 조회 성공',
-    type: Order,
   })
   getOrderDetail(@Param('id') id: string): Promise<Order> {
     return this.ordersService.findOne(+id);

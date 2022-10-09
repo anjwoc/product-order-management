@@ -1,22 +1,19 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-import { Request, Response as ExpressResponse } from 'express';
-
-export interface Response<T> {
-  success: boolean;
-  data: T;
-}
+import { IResponseWrapper } from 'src/common/interfaces/response-wrapper.interface';
 
 export class TransformInterceptor<T>
-  implements NestInterceptor<T, Response<T>>
+  implements NestInterceptor<T, IResponseWrapper<T>>
 {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<Response<T>> | Promise<Observable<Response<T>>> {
+  ):
+    | Observable<IResponseWrapper<T>>
+    | Promise<Observable<IResponseWrapper<T>>> {
     return next.handle().pipe(
-      map((result) => {
-        return { success: true, data: result };
+      map((data) => {
+        return { success: true, data: data };
       }),
     );
   }
