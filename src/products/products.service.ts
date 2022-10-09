@@ -30,7 +30,6 @@ export class ProductsService {
       take: take,
       skip: skip,
       order: { createdAt: orderBy },
-      relations: ['products'],
     });
 
     const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
