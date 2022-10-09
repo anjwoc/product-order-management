@@ -8,6 +8,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
+import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
 import { Product } from 'src/products/product.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -77,6 +78,28 @@ export class OrdersService {
       throw err;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async cancelOrder(id: string): Promise<UpdateSuccessDto> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const updatedRow = await queryRunner.manager
+        .getRepository(Order)
+        .update(id, {
+          orderStatus: OrderStatus.CANCELED,
+        });
+
+      const isUpdaetd = updatedRow.affected > 0;
+
+      return { success: isUpdaetd };
+    } catch (err) {
+      queryRunner.rollbackTransaction();
+    } finally {
+      queryRunner.release();
     }
   }
 

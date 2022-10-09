@@ -19,6 +19,7 @@ import { OrderDto } from './dto/order.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { Order } from './order.entity';
 import { PageDto } from 'src/common/dto/pagination.dto';
+import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -47,12 +48,23 @@ export class OrdersController {
     return this.ordersService.completeOrder(+id);
   }
 
-  @Post('/cancel')
+  @Post('/cancel/:id')
   @ApiOperation({ summary: '주문 취소 요청' })
   @ApiResponse({
     status: 200,
     description: '주문 취소 요청 성공',
     type: Boolean,
+  })
+  cancelOrder(@Param('id') id: string): Promise<UpdateSuccessDto> {
+    return this.ordersService.cancelOrder(id);
+  }
+
+  @Post('/partial-cancel')
+  @ApiOperation({ summary: '상품 부분 취소 요청' })
+  @ApiResponse({
+    status: 200,
+    description: '상품 부분 취소 요청 성공',
+    type: Order,
   })
   partialCancelOrder(
     @Body() partialCancelOrderDto: PartialCancelOrderDto,
@@ -78,17 +90,6 @@ export class OrdersController {
   })
   getOrderDetail(@Param('id') id: string): Promise<Order> {
     return this.ordersService.findOne(+id);
-  }
-
-  @Post()
-  @ApiOperation({ summary: '주문 생성' })
-  @ApiResponse({
-    status: 201,
-    description: '주문 생성 성공',
-    type: Order,
-  })
-  create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    return this.ordersService.create(createOrderDto);
   }
 
   @Put(':id')

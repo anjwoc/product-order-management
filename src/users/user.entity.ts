@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
 import { CommonEntity } from 'src/common/common.entity';
 import { Order } from 'src/orders/order.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
@@ -26,6 +32,7 @@ export class User extends CommonEntity {
 
   @ApiProperty({ type: 'string', description: '전화번호' })
   @IsString()
+  @IsPhoneNumber('KR', { message: '전화번호 형식이 맞지 않습니다.' })
   @Column({ type: 'varchar', nullable: false })
   phoneNumber: string;
 
