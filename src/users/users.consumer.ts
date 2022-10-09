@@ -21,7 +21,6 @@ export class UsersConsumer {
 
   @Process('register')
   afterRegister(job: Job) {
-    this.logger.debug(job.data);
     this.printRegisteredUser(job.data);
   }
 

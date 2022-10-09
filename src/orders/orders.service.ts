@@ -113,7 +113,7 @@ export class OrdersService {
     const { orderId, products } = partialCancelOrderDto;
 
     try {
-      const order = await this.orderRepository.findOne({
+      const order = await queryRunner.manager.getRepository(Order).findOne({
         where: { id: orderId },
         relations: ['products'],
       });
@@ -139,7 +139,9 @@ export class OrdersService {
 
       order.products = remaining;
 
-      const partialCancel = await this.orderRepository.save(order);
+      const partialCancel = await queryRunner.manager
+        .getRepository(Order)
+        .save(order);
       await queryRunner.commitTransaction();
 
       this.orderQueue.add('partialCancelOrder', cancelProducts);
@@ -159,9 +161,11 @@ export class OrdersService {
     await queryRunner.startTransaction();
 
     try {
-      const updatedRow = await this.orderRepository.update(id, {
-        orderStatus: OrderStatus.COMPLETED,
-      });
+      const updatedRow = await queryRunner.manager
+        .getRepository(Order)
+        .update(id, {
+          orderStatus: OrderStatus.COMPLETED,
+        });
 
       const isUpdaetd = updatedRow.affected > 0;
 

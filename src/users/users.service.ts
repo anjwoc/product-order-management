@@ -20,6 +20,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import bcrypt from 'bcrypt';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -38,7 +39,9 @@ export class UsersService {
     private connection: DataSource,
   ) {}
 
-  async register(userRegisterDto: UserRegisterDto): Promise<void> {
+  async register(
+    userRegisterDto: UserRegisterDto,
+  ): Promise<RegisterResponseDto> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -46,7 +49,9 @@ export class UsersService {
     try {
       const { email, password } = userRegisterDto;
 
-      const user = await this.usersRepository.findOne({ where: { email } });
+      const user = await queryRunner.manager
+        .getRepository(User)
+        .findOne({ where: { email } });
 
       if (user) {
         throw new UnauthorizedException('이미 가입된 사용자가 존재합니다.');
@@ -62,6 +67,8 @@ export class UsersService {
       await queryRunner.commitTransaction();
 
       this.userQueue.add('register', userRegisterDto);
+
+      return new RegisterResponseDto(userRegisterDto);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;

@@ -1,8 +1,10 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
+import { Request, Response as ExpressResponse } from 'express';
 
 export interface Response<T> {
-  result: T;
+  success: boolean;
+  data: T;
 }
 
 export class TransformInterceptor<T>
@@ -12,6 +14,10 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> | Promise<Observable<Response<T>>> {
-    return next.handle().pipe(map((result) => ({ result })));
+    return next.handle().pipe(
+      map((result) => {
+        return { success: true, data: result };
+      }),
+    );
   }
 }

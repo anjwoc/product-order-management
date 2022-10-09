@@ -1,23 +1,13 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
 import { UserPaginationDto } from './dto/user-pagination.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { UserDto } from './dto/user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PageDto } from 'src/common/dto/pagination.dto';
+import { CreateSuccessDto } from '../common/dto/create-success.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -29,9 +19,11 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: '회원가입 성공',
-    type: UserRegisterDto,
+    type: CreateSuccessDto,
   })
-  register(@Body() userRegisterDto: UserRegisterDto): Promise<void> {
+  register(
+    @Body() userRegisterDto: UserRegisterDto,
+  ): Promise<RegisterResponseDto> {
     return this.usersService.register(userRegisterDto);
   }
 

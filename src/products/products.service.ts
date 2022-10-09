@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -14,14 +14,29 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+
+    @InjectDataSource()
+    private connection: DataSource,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<ProductDto> {
-    const product = await this.productRepository.create(createProductDto);
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    await this.productRepository.save(product);
+    try {
+      const product = await queryRunner.manager
+        .getRepository(Product)
+        .create(createProductDto);
 
-    return product;
+      await queryRunner.manager.getRepository(Product).save(product);
+
+      return product;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ProductDto>> {
