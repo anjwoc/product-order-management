@@ -15,6 +15,7 @@ import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator
 import { UserPaginationDto } from './dto/user-pagination.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { UserDto } from './dto/user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +24,11 @@ export class UsersController {
   @Post('/register')
   register(@Body() userRegisterDto: UserRegisterDto) {
     return this.usersService.register(userRegisterDto);
+  }
+
+  @Post('/login')
+  login(@Body() userLoginDto: UserLoginDto) {
+    return this.usersService.verifyUserAndSignJwt(userLoginDto);
   }
 
   @Get()

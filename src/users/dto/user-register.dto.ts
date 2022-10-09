@@ -6,7 +6,7 @@ export class UserRegisterDto extends PickType(User, [
   'email',
   'username',
   'phoneNumber',
-]) {
+] as const) {
   @IsNotEmpty()
   password: string;
 

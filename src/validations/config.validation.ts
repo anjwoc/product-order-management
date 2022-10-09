@@ -19,7 +19,7 @@ const configValidation = Joi.object({
   POSTGRES_PASSWORD: Joi.string().required(),
   REDIS_HOST: Joi.string().required(),
   REDIS_PORT: Joi.number().default(6379),
-  REDIS_PASSWORD: Joi.string().required(),
+  REDIS_PASSWORD: Joi.string().optional(),
 });
 
 export { configValidation };
