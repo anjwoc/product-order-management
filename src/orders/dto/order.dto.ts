@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/mapped-types';
+import { PickType } from '@nestjs/swagger';
 import { Order } from '../order.entity';
 
 export class OrderDto extends PickType(Order, [

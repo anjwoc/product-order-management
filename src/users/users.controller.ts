@@ -52,7 +52,6 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: '조회 성공',
-    // type: PageDto<UserDto>,
   })
   getUserList(@Query() userPaginationDto: UserPaginationDto) {
     return this.usersService.findAll(userPaginationDto);

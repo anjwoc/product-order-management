@@ -8,18 +8,18 @@ import { OrderStatus } from './order.status';
 
 @Entity({ name: 'Order' })
 export class Order extends CommonEntity {
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: '수령인 이름' })
   @IsNotEmpty()
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverName: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: '수령인 전화번호' })
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverPhone: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: '수령인 주소' })
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   receiverAddress: string;
@@ -28,6 +28,7 @@ export class Order extends CommonEntity {
     name: 'orderStatus',
     enum: OrderStatus,
     enumName: 'OrderStatus',
+    description: '주문 상태',
   })
   @Column({
     type: 'enum',
@@ -36,11 +37,11 @@ export class Order extends CommonEntity {
   })
   orderStatus: OrderStatus;
 
-  @ApiProperty({ type: () => [User] })
+  @ApiProperty({ type: () => [User], description: '주문한 사람' })
   @ManyToOne(() => User, (users) => users.orders)
   user: User;
 
-  @ApiProperty({ type: () => [Product] })
+  @ApiProperty({ type: () => [Product], description: '주문 상품 리스트' })
   @ManyToMany(() => Product, (products) => products.orders, {
     cascade: true,
     onDelete: 'NO ACTION',
