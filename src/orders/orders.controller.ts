@@ -38,11 +38,6 @@ export class OrdersController {
     return this.ordersService.partialCancelOrder(partialCancelOrderDto);
   }
 
-  @Post('/cancel-test')
-  partialCancelOrderTest(@Body() partialCancelOrderDto: PartialCancelOrderDto) {
-    return this.ordersService.partialCancelOrderTest(partialCancelOrderDto);
-  }
-
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);

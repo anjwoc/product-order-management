@@ -151,35 +151,6 @@ export class OrdersService {
     }
   }
 
-  async partialCancelOrderTest(
-    partialCancelOrderDto: PartialCancelOrderDto,
-  ): Promise<UpdateResult> {
-    const { orderId, products } = partialCancelOrderDto;
-
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId },
-      relations: ['products'],
-    });
-
-    if (!order) {
-      throw new NotFoundException('존재하지 않는 주문 번호입니다.');
-    }
-
-    const filteredProducts = order.products.filter(
-      (order) => !products.includes(order.id),
-    );
-
-    if (!filteredProducts) {
-      throw new BadRequestException('취소할 상품이 없습니다.');
-    }
-
-    order.products = filteredProducts;
-
-    const partialCancel = await this.orderRepository.update(orderId, order);
-
-    return partialCancel;
-  }
-
   async findAll(
     pageOptionsDto: OrderPaginationDto,
   ): Promise<PageDto<OrderDto>> {
