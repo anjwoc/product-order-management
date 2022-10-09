@@ -9,7 +9,7 @@ import { Queue } from 'bull';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
 import { Product } from 'src/products/product.entity';
-import { DataSource, Repository, UpdateResult } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { OrderDto } from './dto/order.dto';
@@ -154,14 +154,14 @@ export class OrdersService {
   async findAll(
     pageOptionsDto: OrderPaginationDto,
   ): Promise<PageDto<OrderDto>> {
-    const { take, skip, order, orderStatus } = pageOptionsDto;
+    const { take, skip, orderBy, orderStatus } = pageOptionsDto;
     const [orders, itemCount] = await this.orderRepository.findAndCount({
       where: {
         orderStatus: orderStatus,
       },
       take: take,
       skip: skip,
-      order: { createdAt: order },
+      order: { createdAt: orderBy },
       relations: ['products'],
     });
 

@@ -7,7 +7,7 @@ export class PageOptionsDto {
   @ApiPropertyOptional({ enum: OrderBy, default: OrderBy.ASC })
   @IsOptional()
   @IsEnum(OrderBy)
-  readonly order?: OrderBy = OrderBy.ASC;
+  readonly orderBy?: OrderBy = OrderBy.ASC;
 
   @ApiPropertyOptional({
     minimum: 1,

@@ -1,12 +1,23 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  Catch,
+  HttpException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { User } from './user.entity';
+import { UserPaginationDto } from './dto/user-pagination.dto';
+import { PageDto } from 'src/common/dto/pagination.dto';
+import { UserDto } from './dto/user.dto';
+import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import bcrypt from 'bcrypt';
+import { HttpExceptionFilter } from 'src/exceptions/http-exception.filter';
 
 @Injectable()
 export class UsersService {
@@ -31,8 +42,8 @@ export class UsersService {
 
       const user = await this.usersRepository.findOne({ where: { email } });
 
-      if (!user) {
-        throw new UnauthorizedException('해당 이메일로 가입된 사용자가 존재합니다.');
+      if (user) {
+        throw new UnauthorizedException('이미 가입된 사용자가 존재합니다.');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -55,8 +66,20 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(pageOptionsDto: UserPaginationDto): Promise<PageDto<UserDto>> {
+    const { take, skip, orderBy, isAdmin } = pageOptionsDto;
+    const [users, itemCount] = await this.usersRepository.findAndCount({
+      where: {
+        isAdmin: isAdmin,
+      },
+      take: take,
+      skip: skip,
+      order: { createdAt: orderBy },
+    });
+
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+
+    return new PageDto(users, pageMeta);
   }
 
   findOne(id: number) {

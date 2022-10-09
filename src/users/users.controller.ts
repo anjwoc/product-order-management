@@ -6,23 +6,34 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
+import { UserPaginationDto } from './dto/user-pagination.dto';
+import { UserRegisterDto } from './dto/user-register.dto';
+import { UserDto } from './dto/user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Post('/register')
+  register(@Body() userRegisterDto: UserRegisterDto) {
+    return this.usersService.register(userRegisterDto);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @ApiPaginatedResponse(UserDto)
+  getUserList(@Query() userPaginationDto: UserPaginationDto) {
+    return this.usersService.findAll(userPaginationDto);
+  }
+
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Get(':id')
