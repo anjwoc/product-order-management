@@ -4,9 +4,9 @@ import { IsBoolean, IsOptional } from 'class-validator';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 
 export class UserPaginationDto extends PageOptionsDto {
+  @ApiProperty({ type: 'boolean', description: '관리자 여부', required: false })
+  @Transform(({ value }) => value === 'true')
   @IsBoolean()
   @IsOptional()
-  @Transform(({ value }) => value === 'true')
-  @ApiProperty()
   isAdmin: boolean;
 }
