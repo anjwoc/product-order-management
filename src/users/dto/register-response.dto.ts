@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { User } from '../user.entity';
 import { UserRegisterDto } from './user-register.dto';
+import { IResponseWrapper } from '../../common/interfaces/response-wrapper.interface';
 
 export class RegisterResponseDto extends OmitType(User, [
   'id',

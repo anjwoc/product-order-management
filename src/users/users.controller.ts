@@ -6,7 +6,6 @@ import { UserRegisterDto } from './dto/user-register.dto';
 import { UserDto } from './dto/user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSuccessDto } from '../common/dto/create-success.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 
 @ApiTags('Users')
@@ -19,7 +18,7 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: '회원가입 성공',
-    type: CreateSuccessDto,
+    type: RegisterResponseDto,
   })
   register(
     @Body() userRegisterDto: UserRegisterDto,
