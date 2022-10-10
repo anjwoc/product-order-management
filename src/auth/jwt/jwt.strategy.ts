@@ -1,5 +1,5 @@
 import { JwtPayloadDto } from './jwt.payload.dto';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, VerifiedCallback } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayloadDto) {
+  async validate(payload: JwtPayloadDto, done: VerifiedCallback) {
     try {
       const user = await this.usersService.findUserById(
         payload.sub as unknown as number,
@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new Error('해당하는 유저가 없습니다.');
       }
 
-      return user;
+      return done(null, user);
     } catch (err) {
       throw new UnauthorizedException(err);
     }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserPaginationDto } from './dto/user-pagination.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
@@ -8,6 +8,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ApiResponseDto } from 'src/common/decorators/response-dto.decorator';
 import { PageDto } from 'src/common/dto/pagination.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -39,6 +40,7 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '회원 전체 조회' })
   @ApiResponseDto(PageDto<UserDto>)
   @ApiResponse({

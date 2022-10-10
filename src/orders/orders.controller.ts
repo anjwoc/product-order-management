@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -19,6 +20,7 @@ import { PageDto } from 'src/common/dto/pagination.dto';
 import { ApiResponseDto } from 'src/common/decorators/response-dto.decorator';
 import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
 import { DeleteSuccessDto } from 'src/common/dto/delete-success.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @ApiTags('Orders')
 @Controller('orders')
