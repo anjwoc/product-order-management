@@ -132,19 +132,41 @@ async someFunc(requestOrderDto: RequestOrderDto): Promise<Entity> {
 
 Nest.js에서도 AOP를 위해 제공하는 패턴이 있고 거기서 사용한 패턴은 총 3가지 입니다.
 
-1. HttpExceptionFilter
+1. `HttpExceptionFilter`
 
    - 애플리케이션 단에서 발생하는 모든 예외를 캐치해서 처리하는 글로벌 필터입니다.
    - API에서 발생한 에러일 경우 의도한 리스폰스 포맷으로 응답하도록 구현해놓고 그 이외의 예외는 Nest.js의 기본 내장 예외 필터가 처리하게 됩니다.
+   - `Sample Response`
+   - ```typescript
+       {
+           "success": false,
+           "statusCode": 401,
+           "timestamp": "2022-10-10T17:27:53.754Z",
+           "path": "/users/login",
+           "message": {
+               "statusCode": 401,
+               "message": "로그인에 실패했습니다.",
+               "error": "Unauthorized",
+               "stacktrace": "UnauthorizedException: 로그인에 실패했습니다.\n    at UsersService.verifyUserAndSignJwt (/Users/jcjeong/project/product-order-management/src/users/users.service.ts:94:13)"
+           }
+       }
+     ```
 
-2. TransformInterceptor
+2. `TransformInterceptor`
 
    - 모든 API의 표준 응답 포맷을 적용하기 위해 사용한 인터셉터입니다.
+   - 각 API의 결과 데이터를 아래 객체에서 data넣어서 응답하게 됩니다.
+   - ```typescript
+      {
+          "success": true,
+          "data": []
+      }
+     ```
 
-3. LoggingInterceptor
-
+3. `LoggingInterceptor`
    - 모든 API 요청에 대한 특정 로깅을 위한 인터셉터입니다.
    - 과제에서는 API가 수행되는 걸린 시간을 로깅하도록 구현했고 실제로 서비스를 개발할 떄는 로깅을 위해 디비에 저장한다던지 하는 여러 동작을 수행할 수 있습니다.
+   - ![Logging](/resources/logging_interceptor.png)
 
 # Installation
 
