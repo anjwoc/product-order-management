@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -15,7 +16,6 @@ import { ProductDto } from './dto/product.dto';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
 import { ApiResponseDto } from 'src/common/decorators/response-dto.decorator';
-import { UpdateResult } from 'typeorm';
 import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
 import { DeleteSuccessDto } from 'src/common/dto/delete-success.dto';
 
@@ -59,7 +59,7 @@ export class ProductsController {
     return this.productsService.findOne(+id);
   }
 
-  @Post(':id')
+  @Put(':id')
   @ApiOperation({ summary: '상품 수정' })
   @ApiResponseDto(UpdateSuccessDto)
   @ApiResponse({

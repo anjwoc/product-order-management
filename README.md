@@ -35,8 +35,13 @@
 
 - ### Postgresql
 
-- ### TypeORM
+  - Postgresql은 자체적으로 구축해서 사용중인 홈 서버에 Docker로 올려서 사용했습니다.
+
 - ### Redis(Bull Message Queue)
+
+  - Redis도 Postgresql과 마찬가지로 홈 서버에 Docker를 이용해 사용했습니다.
+
+- ### TypeORM
 
 - ### Swagger Open API 3.0
 - ### Passport JWT
@@ -91,7 +96,7 @@ REDIS_PORT = 16379
 
 ## Running the app
 
-데모를 실행해보실 때는 `npm run start:dev`로 실행해보시면 됩니다.
+데모를 실행해보실 때는 `npm run start`로 실행해보시면 됩니다.
 
 ```bash
 # development
@@ -107,6 +112,14 @@ $ npm run start:debug
 $ npm run start:prod
 ```
 
+### Swagger 접속 주소
+
+환경변수에서 포트 부분을 변경할 경우 해당 포트로 기입하면 됩니다.
+
+```plaintext
+http://localhost:3000/api
+```
+
 ## Test
 
 ```bash
@@ -119,3 +132,30 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+# API
+
+## Order
+
+- 주문 조회 `(GET /orders)`
+- 주문 상세 조회 `(GET /orders/{id})`
+- 주문 접수 요청 `(POST /orders)`
+- 주문 완료 요청 `(POST /orders/complete/{id})`
+- 주문 취소 요청 `(POST /orders/cancel/{id})`
+- 주문 상품 부분 취소 요청 `(POST /orders/partial-cancel)`
+- 주문 수정 `(PUT /orders)`
+- 주문 삭제 `(DELETE /orders)`
+
+## Product
+
+- 상품 조회 `(GET /products)`
+- 상품 상세 조회 `(GET /products/{id})`
+- 상품 등록 `(POST /products)`
+- 상품 수정 `(PUT /products/{id})`
+- 상품 삭제 `(DELETE /products/{id})`
+
+## User
+
+- 회원 전체 조회 `(GET /users)`
+- 회원가입 `(POST /users/register)`
+- 로그인 `(POST /users/login)`

@@ -92,11 +92,11 @@ export class OrdersController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: '상품 수정' })
+  @ApiOperation({ summary: '주문 수정' })
   @ApiResponseDto(UpdateSuccessDto)
   @ApiResponse({
     status: 200,
-    description: '상품 수정 성공',
+    description: '주문 수정 성공',
   })
   update(
     @Param('id') id: string,
