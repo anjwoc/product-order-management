@@ -95,6 +95,18 @@ Redis를 Bull Message Queue라는 패키지를 이용해서 메세지 브로커�
 
 ![message_broker](/resources/message_broker.png)
 
+## Order Consumer
+
+### 주문 접수 후 로그
+
+![order_consumer](/resources/order_consumer.png)
+
+## User Consumer
+
+### 로그인 후 로그
+
+![user_consumer](/resources/user_consumer.png)
+
 ## Transaction 구현 패턴
 
 `Nest.js`와 `TypeORM`은 튜토리얼을 제외하면 처음 사용해서 트랜잭션을 처리하는 방법을 몰라 여러 방법을 조사해서 한 가지 방법을 선택했습니다.
@@ -234,7 +246,7 @@ $ npm run start:debug
 $ npm run start:prod
 ```
 
-### Swagger 접속 주소
+## Swagger 접속 주소
 
 환경변수에서 포트 부분을 변경할 경우 해당 포트로 기입하면 됩니다.
 
