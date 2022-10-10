@@ -108,12 +108,12 @@ export class OrdersController {
 
   @Delete(':id')
   @ApiOperation({ summary: '주문 삭제' })
+  @ApiResponseDto(Boolean)
   @ApiResponse({
     status: 200,
     description: '주문 삭제 성공',
-    type: Boolean,
   })
-  remove(@Param('id') id: string): Promise<Order> {
+  remove(@Param('id') id: string): Promise<boolean> {
     return this.ordersService.remove(+id);
   }
 }

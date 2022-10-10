@@ -212,18 +212,6 @@ export class OrdersService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<boolean> {
-    if (!id) {
-      throw new BadRequestException('주문 번호가 없습니다.');
-    }
-
-    const updatedRow = await this.orderRepository.update(id, updateOrderDto);
-
-    const isUpdated = updatedRow.affected > 0;
-
-    return isUpdated;
-  }
-
-  async remove(id: number): Promise<Order> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -233,21 +221,40 @@ export class OrdersService {
         throw new BadRequestException('주문 번호가 없습니다.');
       }
 
-      const order = await queryRunner.manager
-        .getRepository(Order)
-        .findOne({ where: { id: id } });
+      const updatedRow = await this.orderRepository.update(id, updateOrderDto);
 
-      if (!order) {
-        throw new NotFoundException('삭제할 주문 정보가 없습니다.');
+      const isUpdated = updatedRow.affected > 0;
+
+      await queryRunner.commitTransaction();
+
+      return isUpdated;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async remove(id: number): Promise<boolean> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if (!id) {
+        throw new BadRequestException('주문 번호가 없습니다.');
       }
 
       const deletedRow = await queryRunner.manager
         .getRepository(Order)
-        .softRemove(order);
+        .softDelete(id);
 
       await queryRunner.commitTransaction();
 
-      return deletedRow;
+      const isDeleted = deletedRow.affected > 0;
+
+      return isDeleted;
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
