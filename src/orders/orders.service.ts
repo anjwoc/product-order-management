@@ -223,19 +223,36 @@ export class OrdersService {
     return isUpdated;
   }
 
-  async remove(id: number): Promise<boolean> {
-    if (!id) {
-      throw new BadRequestException('주문 번호가 없습니다.');
+  async remove(id: number): Promise<Order> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if (!id) {
+        throw new BadRequestException('주문 번호가 없습니다.');
+      }
+
+      const order = await queryRunner.manager
+        .getRepository(Order)
+        .findOne({ where: { id: id } });
+
+      if (!order) {
+        throw new NotFoundException('삭제할 주문 정보가 없습니다.');
+      }
+
+      const deletedRow = await queryRunner.manager
+        .getRepository(Order)
+        .softRemove(order);
+
+      await queryRunner.commitTransaction();
+
+      return deletedRow;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    const deletedRow = await this.orderRepository.delete(id);
-
-    const isDeleted = deletedRow.affected > 0;
-
-    if (!isDeleted) {
-      throw new BadRequestException('존재하지 않는 주문 번호입니다.');
-    }
-
-    return isDeleted;
   }
 }

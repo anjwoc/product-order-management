@@ -44,7 +44,7 @@ export class Order extends CommonEntity {
   @ApiProperty({ type: () => [Product], description: '주문 상품 리스트' })
   @ManyToMany(() => Product, (products) => products.orders, {
     cascade: true,
-    onDelete: 'NO ACTION',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinTable({

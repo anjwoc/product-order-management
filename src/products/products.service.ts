@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
@@ -81,10 +85,37 @@ export class ProductsService {
   }
 
   async remove(id: number): Promise<boolean> {
-    const deletedRow = await this.productRepository.delete(id);
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const isDeleted = deletedRow.affected > 0;
+    try {
+      if (!id) {
+        throw new BadRequestException('상품 번호가 없습니다.');
+      }
 
-    return isDeleted;
+      const product = await queryRunner.manager
+        .getRepository(Product)
+        .findOne({ where: { id: id } });
+
+      if (!product) {
+        throw new NotFoundException('삭제할 상품이 없습니다.');
+      }
+
+      const deletedRow = await queryRunner.manager
+        .getRepository(Product)
+        .delete(id);
+
+      const isDeleted = deletedRow.affected > 0;
+
+      await queryRunner.commitTransaction();
+
+      return isDeleted;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

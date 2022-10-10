@@ -113,7 +113,7 @@ export class OrdersController {
     description: '주문 삭제 성공',
     type: Boolean,
   })
-  remove(@Param('id') id: string): Promise<boolean> {
+  remove(@Param('id') id: string): Promise<Order> {
     return this.ordersService.remove(+id);
   }
 }
