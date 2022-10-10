@@ -193,6 +193,7 @@ $ npm install
 ## Environment
 
 환경 변수는 프로젝트의 루트 패스 기준으로 `.env` 라는 이름으로 파일을 생성해서 아래 내용을 기입해주시면 됩니다.
+![env](/resources/env_path.png)
 
 ### 환경변수 내용
 
