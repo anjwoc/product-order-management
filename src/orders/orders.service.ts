@@ -169,6 +169,8 @@ export class OrdersService {
 
       const isUpdaetd = updatedRow.affected > 0;
 
+      await queryRunner.commitTransaction();
+
       return isUpdaetd;
     } catch (err) {
       await queryRunner.rollbackTransaction();
