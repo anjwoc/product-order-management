@@ -14,8 +14,10 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductDto } from './dto/product.dto';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
-import { ApiPaginatedResponse } from 'src/common/decorators/pagination.decorator';
 import { ApiResponseDto } from 'src/common/decorators/response-dto.decorator';
+import { UpdateResult } from 'typeorm';
+import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
+import { DeleteSuccessDto } from 'src/common/dto/delete-success.dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -53,13 +55,13 @@ export class ProductsController {
     status: 200,
     description: '상품 상세 조회 성공',
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<ProductDto> {
     return this.productsService.findOne(+id);
   }
 
   @Post(':id')
   @ApiOperation({ summary: '상품 수정' })
-  @ApiResponseDto(Boolean)
+  @ApiResponseDto(UpdateSuccessDto)
   @ApiResponse({
     status: 200,
     description: '상품 수정 성공',
@@ -67,18 +69,18 @@ export class ProductsController {
   update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<boolean> {
+  ): Promise<UpdateSuccessDto> {
     return this.productsService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '상품 삭제' })
-  @ApiResponseDto(Boolean)
+  @ApiResponseDto(DeleteSuccessDto)
   @ApiResponse({
     status: 200,
     description: '상품 삭제 성공',
   })
-  remove(@Param('id') id: string): Promise<boolean> {
+  remove(@Param('id') id: string): Promise<DeleteSuccessDto> {
     return this.productsService.remove(+id);
   }
 }

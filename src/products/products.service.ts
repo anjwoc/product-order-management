@@ -4,10 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DeleteSuccessDto } from 'src/common/dto/delete-success.dto';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
-import { DataSource, Repository } from 'typeorm';
+import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
+import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -56,7 +58,7 @@ export class ProductsService {
     return new PageDto(orders, pageMeta);
   }
 
-  async findOne(id: number): Promise<Product | undefined> {
+  async findOne(id: number): Promise<ProductDto> {
     const product = await this.productRepository.findOne({
       where: {
         id: id,
@@ -73,7 +75,7 @@ export class ProductsService {
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
-  ): Promise<boolean> {
+  ): Promise<UpdateSuccessDto> {
     const updatedRow = await this.productRepository.update(
       id,
       updateProductDto,
@@ -81,10 +83,10 @@ export class ProductsService {
 
     const isUpdated = updatedRow.affected > 0;
 
-    return isUpdated;
+    return new UpdateSuccessDto(isUpdated);
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(id: number): Promise<DeleteSuccessDto> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -104,13 +106,13 @@ export class ProductsService {
 
       const deletedRow = await queryRunner.manager
         .getRepository(Product)
-        .delete(id);
+        .softDelete(id);
 
       const isDeleted = deletedRow.affected > 0;
 
       await queryRunner.commitTransaction();
 
-      return isDeleted;
+      return new DeleteSuccessDto(isDeleted);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;

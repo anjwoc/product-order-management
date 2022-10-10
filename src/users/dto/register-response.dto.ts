@@ -4,6 +4,7 @@ import { UserRegisterDto } from './user-register.dto';
 
 export class RegisterResponseDto extends OmitType(User, [
   'id',
+  'orders',
   'createdAt',
   'deletedAt',
   'password',

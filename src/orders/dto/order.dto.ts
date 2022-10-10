@@ -8,5 +8,4 @@ export class OrderDto extends PickType(Order, [
   'receiverPhone',
   'orderStatus',
   'products',
-  'user',
 ]) {}

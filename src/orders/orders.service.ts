@@ -1,14 +1,13 @@
-import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { PageMetaDto } from 'src/common/dto/pagination-meta.dto';
 import { PageDto } from 'src/common/dto/pagination.dto';
-import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
 import { Product } from 'src/products/product.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -19,6 +18,8 @@ import { RequestOrderDto } from './dto/request-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './order.entity';
 import { OrderStatus } from './order.status';
+import { UpdateSuccessDto } from 'src/common/dto/update-success.dto';
+import { DeleteSuccessDto } from 'src/common/dto/delete-success.dto';
 
 @Injectable()
 export class OrdersService {
@@ -32,7 +33,7 @@ export class OrdersService {
     @InjectQueue('order')
     private orderQueue: Queue,
   ) {}
-  async create(createOrderDto: CreateOrderDto): Promise<Order | undefined> {
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
     const order = await this.orderRepository.create(createOrderDto);
 
     await this.orderRepository.save(order);
@@ -40,7 +41,7 @@ export class OrdersService {
     return order;
   }
 
-  async requestOrder(requestOrderDto: RequestOrderDto) {
+  async requestOrder(requestOrderDto: RequestOrderDto): Promise<Order> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -95,7 +96,9 @@ export class OrdersService {
 
       const isUpdaetd = updatedRow.affected > 0;
 
-      return { success: isUpdaetd };
+      await queryRunner.commitTransaction();
+
+      return new UpdateSuccessDto(isUpdaetd);
     } catch (err) {
       queryRunner.rollbackTransaction();
     } finally {
@@ -155,7 +158,7 @@ export class OrdersService {
     }
   }
 
-  async completeOrder(id: number): Promise<boolean> {
+  async completeOrder(id: number): Promise<UpdateSuccessDto> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -171,7 +174,7 @@ export class OrdersService {
 
       await queryRunner.commitTransaction();
 
-      return isUpdaetd;
+      return new UpdateSuccessDto(isUpdaetd);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -213,7 +216,10 @@ export class OrdersService {
     return order;
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<boolean> {
+  async update(
+    id: number,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<UpdateSuccessDto> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -229,7 +235,7 @@ export class OrdersService {
 
       await queryRunner.commitTransaction();
 
-      return isUpdated;
+      return new UpdateSuccessDto(isUpdated);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -238,7 +244,7 @@ export class OrdersService {
     }
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(id: number): Promise<DeleteSuccessDto> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -252,11 +258,11 @@ export class OrdersService {
         .getRepository(Order)
         .softDelete(id);
 
-      await queryRunner.commitTransaction();
-
       const isDeleted = deletedRow.affected > 0;
 
-      return isDeleted;
+      await queryRunner.commitTransaction();
+
+      return new DeleteSuccessDto(isDeleted);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;

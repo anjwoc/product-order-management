@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/common.entity';
 import { Order } from 'src/orders/order.entity';
@@ -24,7 +25,6 @@ export class Product extends CommonEntity {
   @Column({ type: 'integer', nullable: false })
   stockQuantity: number;
 
-  @ApiProperty({ type: () => [Order] })
   @ManyToMany(() => Order, (orders) => orders.products)
   orders: Order[];
 }

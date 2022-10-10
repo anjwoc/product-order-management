@@ -4,7 +4,9 @@ import { RequestOrderDto } from 'src/orders/dto/request-order.dto';
 import { ProductDto } from 'src/products/dto/product.dto';
 import { RegisterResponseDto } from 'src/users/dto/register-response.dto';
 import { UserLoginDto } from 'src/users/dto/user-login.dto';
+import { DeleteSuccessDto } from '../dto/delete-success.dto';
 import { ResponseDto } from '../dto/response.dto';
+import { UpdateSuccessDto } from '../dto/update-success.dto';
 
 export const ApiResponseDto = <TModel extends Type<any>>(model: TModel) => {
   return applyDecorators(
@@ -14,6 +16,8 @@ export const ApiResponseDto = <TModel extends Type<any>>(model: TModel) => {
       RegisterResponseDto,
       RequestOrderDto,
       ProductDto,
+      UpdateSuccessDto,
+      DeleteSuccessDto,
     ),
     ApiOkResponse({
       schema: {
