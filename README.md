@@ -124,42 +124,17 @@ src
 
 # Workflow 및 구현 패턴
 
-## Message Broker Workflow
-
-주문 및 취소 시 알림 요구사항을 보고 만든 부분입니다.
-
-Redis를 Bull Message Queue라는 패키지를 이용해서 메세지 브로커로서 이용했습니다.
-
-아래 그림의 플로우는 다음과 같습니다.
-
-1. 클라이언트가 Orders Controller로 주문 접수 요청 또는 주문의 상품 부분 취소 요청을 한다.
-2. 해당 요청에 대응되는 Service Layer의 메소드를 통해 요청을 처리한다.
-3. 요청이 성공일 경우에 결과 데이터를 Order Queue로 주문 접수일 경우 requestOrder란 키값으로 부분 취소 요청일 경우 partialCancel이란 키값으로 메세지를 전달한다.
-4. Orders Consumer에서는 지정해놓은 키값들에 메세지가 생성되면 구독해서 대응되는 메소드에서 로직을 처리
-
-그림에서는 Orders Controller와 Users Controller가 가장 앞단에 존재하지만 사실 메세지 브로커로 메세지를 생성해서 전달하는 프로듀서 역할은 각 Service들이 하고 있습니다.
-
-![message_broker](/resources/message_broker.png)
-
-## Order Consumer
-
-### 주문 접수 후 로그
-
-![order_consumer](/resources/order_consumer.png)
-
-## User Consumer
-
-### 로그인 후 로그
-
-![user_consumer](/resources/user_consumer.png)
-
 ## Transaction 구현 패턴
 
 `Nest.js`와 `TypeORM`은 튜토리얼을 제외하면 처음 사용해서 트랜잭션을 처리하는 방법을 몰라 여러 방법을 조사해서 한 가지 방법을 선택했습니다.
 
-`TypeORM` 공식문서에 따르면 트랜잭션을 사용하는 방법은 [3가지](https://typeorm.io/transactions)가 있고 저는 그 중 권장사항이라고 말하는 `QueryRunner`를 이용하는 방법을 사용했습니다.
+각종 블로그와 여러 문서들에는 트랜잭션을 사용하는 방법은 [3가지](https://typeorm.io/transactions)가 소개되어있습니다.
 
-스프링 프레임워크를 사용하는 사람들이 익숙한 어노테이션을 이용하는(Typescript에서는 데코레이터) 방법도 있지만 아직 `Typescript`에서는 데코레이터가 `Experimental`한 기능이면서 여러 제약 사항으로 완벽히 지원이 안되기 때문에 권장을 하지 않는다는 의미로 이해해서 제외했습니다.
+1. @Transaction Decorator 사용
+2. Transaction 객체를 생성해서 이용하는 방법
+3. QueryRunner를 이용하여 DB 커넥션을 수동으로 관리하는 방법
+
+`TypeORM` 공식문서의 `v0.3.0` [ChangeLog](https://typeorm.io/changelog#030httpsgithubcomtypeormtypeormpull8616-2022-03-17)에 따르면 기존에는 3가지가 있었지만 현재는 1, 2번의 방법이 모두 `Deprecated`된 상태로 3번의 방법인 `QueryRunner`를 이용하는 방법을 사용했습니다.
 
 ### QueryRunner Example
 
@@ -225,6 +200,35 @@ Nest.js에서도 AOP를 위해 제공하는 패턴이 있고 거기서 사용한
    - 모든 API 요청에 대한 특정 로깅을 위한 인터셉터입니다.
    - 과제에서는 API가 수행되는 걸린 시간을 로깅하도록 구현했고 실제로 서비스를 개발할 떄는 로깅을 위해 디비에 저장한다던지 하는 여러 동작을 수행할 수 있습니다.
    - ![Logging](/resources/logging_interceptor.png)
+
+## Message Broker Workflow
+
+주문 및 취소 시 알림 요구사항을 보고 만든 부분입니다.
+
+Redis를 Bull Message Queue라는 패키지를 이용해서 메세지 브로커로서 이용했습니다.
+
+아래 그림의 플로우는 다음과 같습니다.
+
+1. 클라이언트가 Orders Controller로 주문 접수 요청 또는 주문의 상품 부분 취소 요청을 한다.
+2. 해당 요청에 대응되는 Service Layer의 메소드를 통해 요청을 처리한다.
+3. 요청이 성공일 경우에 결과 데이터를 Order Queue로 주문 접수일 경우 requestOrder란 키값으로 부분 취소 요청일 경우 partialCancel이란 키값으로 메세지를 전달한다.
+4. Orders Consumer에서는 지정해놓은 키값들에 메세지가 생성되면 구독해서 대응되는 메소드에서 로직을 처리
+
+그림에서는 Orders Controller와 Users Controller가 가장 앞단에 존재하지만 사실 메세지 브로커로 메세지를 생성해서 전달하는 프로듀서 역할은 각 Service들이 하고 있습니다.
+
+![message_broker](/resources/message_broker.png)
+
+## Order Consumer
+
+### 주문 접수 후 로그
+
+![order_consumer](/resources/order_consumer.png)
+
+## User Consumer
+
+### 로그인 후 로그
+
+![user_consumer](/resources/user_consumer.png)
 
 # Installation
 
