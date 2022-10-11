@@ -72,15 +72,19 @@ src
 ### Components
 
 - auth
-  - 인증/인가와 관련된 컴포넌트로 현재는 JWT란 디렉토리만 있지만 구글 OAuth를 추가할 경우 google이란 이름으로 디렉토리를 추가해서 구현하도록 구조를 구성
+  - 인증/인가와 관련된 컴포넌트
+  - `ex) jwt, google, github, ...etc`
 - common
-  - 각종 DTO, Decorator, enum, interface, utils 등 전역으로 공통적으로 사용될 파일들로 구성
+  - 전역으로 공통적으로 사용될 파일들로 구성
+  - `ex) Dto, Decorator, enum, interface, utils`
 - config
   - database, orm 설정 등 추가적으로 특정 패키지의 설정이 들어갈 때 해당 디렉토리에서 모듈화하도록 구성
 - exceptions
-  - HttpExceptionFilter와 같이 커스텀하게 특정 예외나 에러를 처리하기 위한 클래스들이 위치할 디렉토리
+  - 커스텀하게 특정 예외나 에러를 처리하기 위한 클래스들이 위치할 디렉토리
+  - `ex) HttpExceptionFilter`
 - interceptors
-  - Logging이나 Transform과 같이 특정 역할을 하는 Interceptor 클래스들이 위치할 디렉토리
+  - AOP를 위한 특정 역할을 위한 커스텀한 Interceptor 클래스들이 위치할 디렉토리
+  - `ex) Logging Interceptor, Transform Interceptor`
 - orders
   - 주문 관련 도메인의 파일로 구성
 - products
