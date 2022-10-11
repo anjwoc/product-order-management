@@ -45,6 +45,52 @@
 
 - ### Swagger Open API 3.0
 
+# Project Sturucture
+
+```bash
+src
+├── auth // 인증/인가
+│   └── jwt
+├── common // 공통 컴포넌트
+│   ├── decorators
+│   ├── dto
+│   ├── enum
+│   ├── interfaces
+│   └── utils
+├── config // 설정 관련(DB, ORM, ...)
+├── exceptions // 커스텀 예외 및 에러 클래스
+├── interceptors // 커스텀 인터셉터
+├── orders // 주문 도메인
+│   └── dto
+├── products // 상품 도메인
+│   └── dto
+├── users // 유저 도메인
+│   └── dto
+└── validations // 유효성 검사
+```
+
+### Components
+
+- auth
+  - 인증/인가와 관련된 컴포넌트로 현재는 JWT란 디렉토리만 있지만 구글 OAuth를 추가할 경우 google이란 이름으로 디렉토리를 추가해서 구현하도록 구조를 구성
+- common
+  - 각종 DTO, Decorator, enum, interface, utils 등 전역으로 공통적으로 사용될 파일들로 구성
+- config
+  - database, orm 설정 등 추가적으로 특정 패키지의 설정이 들어갈 때 해당 디렉토리에서 모듈화하도록 구성
+- exceptions
+  - HttpExceptionFilter와 같이 커스텀하게 특정 예외나 에러를 처리하기 위한 클래스들이 위치할 디렉토리
+- interceptors
+  - Logging이나 Transform과 같이 특정 역할을 하는 Interceptor 클래스들이 위치할 디렉토리
+- orders
+  - 주문 관련 도메인의 파일로 구성
+- products
+  - 상품 관련 도메인의 파일로 구성
+- users
+  - 유저 관련 도메인의 파일로 구성
+- validations
+  - 각종 유효성 검사를 위한 파일로 구성
+  - `ex) 환경변수 및 데이터베이스 설정 Validation`
+
 # ERD
 
 ![ERD](/resources/erd.png)
