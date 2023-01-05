@@ -259,28 +259,28 @@ $ npm install
 
 ```bash
 DB_TYPE = postgres
-DB_HOST = anjwoc.duckdns.org
-DB_PORT = 15432
-DB_USERNAME = anjwoc
-DB_PASSWORD = k-89032141
+DB_HOST = 
+DB_PORT = 
+DB_USERNAME = 
+DB_PASSWORD = 
 DB_NAME = nest
 
 # app
 NODE_ENV = develop
 PORT = 3000
-ADMIN_USER = anjwoc
-ADMIN_PASSWORD = k-89032141
+ADMIN_USER = 
+ADMIN_PASSWORD = 
 SECRET_KEY = some_secert_key_nest_js
 COOKIE_SECRET = some_secert_key_nest_js
 
 # postgresql db
-POSTGRES_DB = anjwoc.duckdns.org
-POSTGRES_USER = anjwoc
-POSTGRES_PASSWORD = k-89032141
+POSTGRES_DB = 
+POSTGRES_USER = 
+POSTGRES_PASSWORD = 
 
 # redis config
-REDIS_HOST = anjwoc.duckdns.org
-REDIS_PORT = 16379
+REDIS_HOST = 
+REDIS_PORT = 
 ```
 
 ## Running the app
