@@ -1,5 +1,3 @@
-# Description
-
 # Tech Stacks
 
 - ### Nest.js Framework
